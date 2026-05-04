@@ -1,7 +1,6 @@
 # Arabic Bank Check Amount Extraction and Processing
 
-This project focuses on extracting the **Arabic legal amount written on bank checks** and converting it into a clean, machine-usable representation.  
-Based on the course document (`Term Project-ICS472.pdf`) and the project report (`Arabic_Check_Processing_Report.pdf`), the core idea is to combine **computer vision + OCR + Arabic text post-processing** to build a reliable end-to-end pipeline.
+This project focuses on extracting and verifying the **Arabic legal and courtesy amounts written on bank checks**. Based on the course document (`Term Project-ICS472.pdf`) and the project report (`Arabic_Check_Processing_Report.pdf`), the pipeline combines object detection, sequence recognition, Arabic amount conversion, and final legal/courtesy consistency checking.
 
 ## Project Idea
 
@@ -11,43 +10,53 @@ The target problem is challenging because Arabic bank-check text can include:
 3. segmented tokens and shape variations in Arabic script.
 
 The proposed solution is a multi-stage pipeline:
-1. detect or localize the legal-amount text region on the check,
-2. preprocess the cropped text (grayscale, thresholding, denoising, contrast),
-3. run OCR (Tesseract/EasyOCR and optional custom CNN-assisted components),
-4. normalize recognized Arabic tokens,
-5. convert Arabic amount words into numeric value,
-6. evaluate accuracy and robustness.
-
-The report indicates strong performance on clean samples and lower performance on noisy images, which aligns with expected OCR behavior on real bank checks.
+1. detect the legal and courtesy amount regions on the full check image,
+2. crop the detected regions,
+3. recognize the courtesy amount as a digit sequence,
+4. recognize the legal amount as Arabic text,
+5. convert Arabic legal amount words into a numeric value,
+6. compare the converted legal amount with the courtesy amount for verification.
 
 ## Current Repository Contents
 
-1. `CheckImages\`  
-   Dataset of check images (`.tif`) used for experiments.
-2. `ExampleAnnotations-BoundingBoxes.txt`  
+1. `Images/`  
+   Check images (`.tif`) used for experiments.
+2. `BoundingBoxes/`  
+   YOLO-format legal/courtesy amount annotations.
+3. `CourtesyAmounts/`  
+   Tokenized courtesy amount annotations.
+4. `CourtesyAmounts_raw/`  
+   Raw courtesy amount labels.
+5. `LegalAmounts_raw_text/`  
+   Raw Arabic legal amount labels.
+6. `LegalAmounts_tokenized/`  
+   Tokenized Arabic legal amount labels.
+7. `ExampleAnnotations-BoundingBoxes.txt`  
    Sample bounding-box annotation in YOLO style (`class x_center y_center width height` normalized).
-3. `ExampleAnnotations-LegalAmounts.txt`  
+8. `ExampleAnnotations-LegalAmounts.txt`  
    Sample legal-amount annotation as tokenized Arabic words mapped to image names.
-4. `Term Project-ICS472.pdf`  
+9. `Term Project-ICS472.pdf`  
    Course project brief and expected scope.
-5. `Arabic_Check_Processing_Report.pdf`  
+10. `Arabic_Check_Processing_Report.pdf`  
    Final report with methodology, implementation summary, and results.
 
 ## Project Notebooks
 
-1. `notebooks\01_legal_and_courtesy_amount_extraction.ipynb`  
-   Setup for legal/courtesy field extraction using YOLOv8.
-2. `notebooks\02_courtesy_amount_recognition.ipynb`  
-   Setup for courtesy amount recognition using CNN-BiLSTM-CTC.
-3. `notebooks\03_legal_amount_recognition.ipynb`  
-   Setup for legal amount recognition, preprocessing, and tokenization config.
-4. `notebooks\04_final_verification.ipynb`  
-   Setup for final legal/courtesy matching and evaluation metrics.
+1. `project_notebook.ipynb`  
+   Colab notebook containing the full project pipeline: Part A extraction, Part B courtesy recognition, Part C legal recognition, and Part D final verification.
 
 ## Quick Start
 
-1. Open notebooks in numerical order (`01` to `04`) and run setup cells in each notebook.
-2. Confirm phase paths are detected and output folders are created under `data\`, `models\`, and `outputs\`.
+1. Upload the project folder to Google Drive as `Arabic-Bank-Check-Amount-Extraction-and-Processing`.
+2. Open `project_notebook.ipynb` in Google Colab.
+3. Run the setup cell and confirm that `Images/`, `BoundingBoxes/`, `CourtesyAmounts/`, `LegalAmounts_raw_text/`, and `LegalAmounts_tokenized/` are detected.
+4. Run the notebook sections in order.
+
+Part A writes:
+1. `outputs/partA_output.txt`
+2. `outputs/partA_metrics.txt`
+3. `outputs/partA_annotation_audit.json`
+4. `outputs/partA_split.json`
 
 ## Full Implementation Plan
 
@@ -64,7 +73,7 @@ The report indicates strong performance on clean samples and lower performance o
    - Build rule-based parser for Arabic number words (units, tens, hundreds, thousands, conjunctions).
    - Convert normalized phrase to numeric value.
 5. **Evaluation**
-   - Metrics: field-detection IoU/F1, OCR token accuracy, end-to-end amount accuracy.
+   - Metrics: IoU accuracy at 50%, 75%, and 90%, mean IoU, OCR token accuracy, CER/WER, and end-to-end verification accuracy.
    - Analyze failure cases on noisy/complex checks.
 6. **Packaging**
    - Provide reproducible notebooks/scripts for setup, training, inference, and evaluation.
@@ -80,8 +89,9 @@ The report indicates strong performance on clean samples and lower performance o
 
 ## Expected Output
 
-Given a check image, the system should return:
-1. extracted legal-amount text (Arabic),
-2. normalized legal-amount phrase,
-3. parsed numeric amount,
-4. confidence/diagnostic info for downstream validation.
+For Part A, given a check image, the system should return:
+1. check filename,
+2. courtesy amount bounding box,
+3. legal amount bounding box.
+
+For the full project, the system should also return recognized courtesy digits, recognized legal text, converted legal numeric value, and final verification status.

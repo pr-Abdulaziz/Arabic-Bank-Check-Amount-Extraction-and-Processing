@@ -32,4 +32,9 @@ Thumbs.db
 .vscode/
 .idea/
 
-CheckImages/
+Images/
+BoundingBoxes/
+CourtesyAmounts/
+CourtesyAmounts_raw/
+LegalAmounts_raw_text/
+LegalAmounts/

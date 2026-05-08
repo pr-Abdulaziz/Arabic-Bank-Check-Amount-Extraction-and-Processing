@@ -19,7 +19,10 @@ ENV/
 
 # Generated project artifacts
 outputs/
+results/
 models/
+runs/
+checkpoints/
 data/extracted/
 data/splits/
 data/tokenization/
@@ -38,3 +41,5 @@ CourtesyAmounts/
 CourtesyAmounts_raw/
 LegalAmounts_raw_text/
 LegalAmounts/
+CheckImages-Test/
+CheckAnnotations-Test/
